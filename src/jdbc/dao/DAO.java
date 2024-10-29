@@ -14,6 +14,7 @@ public class DAO {
     public int incluir(String sql, Object... atributos) {
         try {
             PreparedStatement statement = getConexao().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            adicionarAtributos(statement, atributos);
             if (statement.executeUpdate() > 0) {
                 ResultSet resultSet = statement.getGeneratedKeys();
                 if (resultSet.next()) {
@@ -32,7 +33,7 @@ public class DAO {
         for (Object atributo : atributos) {
             if (atributo instanceof String) {
                 statement.setString(indice, (String) atributo);
-            } else {
+            } else if (atributo instanceof Integer) {
                 statement.setInt(indice, (Integer) atributo);
             }
             indice++;
@@ -50,6 +51,14 @@ public class DAO {
         }
         connection = FabricaConexao.getConexao();
         return connection;
+    }
+
+    public void close() {
+        try {
+            getConexao().close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }
